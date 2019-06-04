@@ -200,7 +200,6 @@ let newItemSection = () => {
         createSection.appendChild(resetBtn);
         block.appendChild(createSection);
         block.appendChild(tableBlock)
-        createTable();
     }
 
     let ultrabookFields = (block) => {
@@ -309,7 +308,7 @@ let newItemSection = () => {
                     }
 
                     entities.push(entity.info);
-                    postData("http://localhost:3000/data");
+
                     createTable();
 
                 } else if (entitySelect.value == 'ultrabook') {
@@ -345,7 +344,7 @@ let newItemSection = () => {
                     }
 
                     entities.push(entity.info);
-                    postData("http://localhost:3000/data");
+
                     createTable();
 
                 } else if (entitySelect.value == 'server') {
@@ -380,7 +379,6 @@ let newItemSection = () => {
                     }
 
                     entities.push(entity.info);
-                    postData("http://localhost:3000/data");
                     createTable();
                 }
             }
@@ -406,6 +404,9 @@ let createTable = () => {
     let tHead = document.createElement('thead');
     let tBody = document.createElement('tbody');
     let tHeadRow = document.createElement('tr');
+    let pushDataBtn = document.createElement('button');
+    pushDataBtn.className = 'pushDataBtn';
+    pushDataBtn.innerText = 'Send';
     for (let i = 0; i < 7; i++) {
         let th = document.createElement('th');
         if (!i) {
@@ -468,6 +469,7 @@ let createTable = () => {
     table.appendChild(tBody);
     tableBlock.innerHTML = '';
     tableBlock.appendChild(table);
+    tableBlock.appendChild(pushDataBtn);
 
 
 }
@@ -589,7 +591,7 @@ let postData = (url) => {
     let xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(entities[entities.length - 1]));
+    xhr.send(JSON.stringify(entities));
 }
 let getData = (url) => {
     let xhr = new XMLHttpRequest();
@@ -597,11 +599,10 @@ let getData = (url) => {
     xhr.open("GET", url, false);
     xhr.onreadystatechange = () => {
         transformData = JSON.parse(xhr.responseText);
-
+        console.log(transformData)
     }
     xhr.send()
-    entities = transformData
-    // return transformData;
+    entities = transformData[0]
 }
 
 let mainBlock = () => {
@@ -627,6 +628,8 @@ let mainBlock = () => {
         } else if (target.classList.contains('infoBtn')) {
             let index = target.parentNode.parentNode.rowIndex - 1;
             let infoWindow = new ModalWindow(showInformation(index));
+        } else if (target.classList.contains('pushDataBtn')) {
+            postData("http://localhost:3000/data");
         }
     })
 
