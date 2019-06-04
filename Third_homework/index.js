@@ -277,6 +277,10 @@ function newItemSection() {
             if (target.classList.contains('createBtn')) {
                 createSection.classList.toggle('active');
             }
+            if (target.classList.contains("getDataBtn")) {
+                getData("http://localhost:3000/data")
+                createTable()
+            }
             if (target.classList.contains('saveBtn')) {
                 if (entitySelect.value == 'computer') {
                     inputs = document.querySelectorAll('input');
@@ -303,8 +307,9 @@ function newItemSection() {
                         }
 
                     }
-                    entity.info.id = entities.length;
+
                     entities.push(entity.info);
+                    postData("http://localhost:3000/data");
                     createTable();
 
                 } else if (entitySelect.value == 'ultrabook') {
@@ -338,8 +343,9 @@ function newItemSection() {
                         }
 
                     }
-                    entity.info.id = entities.length;
+
                     entities.push(entity.info);
+                    postData("http://localhost:3000/data");
                     createTable();
 
                 } else if (entitySelect.value == 'server') {
@@ -372,8 +378,9 @@ function newItemSection() {
                             entity.setCoreArchtecture(inputs[i].value);
                         }
                     }
-                    entity.info.id = entities.length;
+
                     entities.push(entity.info);
+                    postData("http://localhost:3000/data");
                     createTable();
                 }
             }
@@ -578,20 +585,42 @@ function showInformation(index) {
     content.appendChild(infoTable);
     return content;
 }
+let postData = (url) => {
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(entities[entities.length - 1]));
+}
+let getData = (url) => {
+    let xhr = new XMLHttpRequest();
+    let transformData;
+    xhr.open("GET", url, false);
+    xhr.onreadystatechange = () => {
+        transformData = JSON.parse(xhr.responseText);
+
+    }
+    xhr.send()
+    entities = transformData
+    // return transformData;
+}
 
 function mainBlock() {
     let main = document.querySelector('.block');
     let createBtn = document.createElement('button');
     createBtn.className = 'createBtn';
     createBtn.innerText = 'New';
+    let getDataBtn = document.createElement('button');
+    getDataBtn.className = "getDataBtn";
+    getDataBtn.innerText = 'Pull itemlist';
     main.appendChild(createBtn);
+    main.appendChild(getDataBtn);
     newItemSection();
     main.addEventListener("click", function (e) {
         let target = e.target;
         if (target.classList.contains('changeBtn')) {
             let index = target.parentNode.parentNode.rowIndex - 1;
             let changeWindow = new ModalWindow(changeEntity(index));
-            changeEntity(index);
+
         } else if (target.classList.contains('deleteBtn')) {
             let index = target.parentNode.parentNode.rowIndex - 1;
             let deleteWindow = new ModalWindow(deleteConfirmation(index));
