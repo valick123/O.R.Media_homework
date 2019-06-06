@@ -306,9 +306,9 @@ let newItemSection = () => {
                         }
 
                     }
-
+                    entity.info.id = entities.length + 1;
                     entities.push(entity.info);
-
+                    postData('http://localhost:3000/data')
                     createTable();
 
                 } else if (entitySelect.value == 'ultrabook') {
@@ -342,8 +342,10 @@ let newItemSection = () => {
                         }
 
                     }
+                    entity.info.id = entities.length + 1;
 
                     entities.push(entity.info);
+                    postData('http://localhost:3000/data')
 
                     createTable();
 
@@ -377,8 +379,11 @@ let newItemSection = () => {
                             entity.setCoreArchtecture(inputs[i].value);
                         }
                     }
+                    entity.info.id = entities.length + 1;
 
                     entities.push(entity.info);
+                    postData('http://localhost:3000/data')
+
                     createTable();
                 }
             }
@@ -404,9 +409,6 @@ let createTable = () => {
     let tHead = document.createElement('thead');
     let tBody = document.createElement('tbody');
     let tHeadRow = document.createElement('tr');
-    let pushDataBtn = document.createElement('button');
-    pushDataBtn.className = 'pushDataBtn';
-    pushDataBtn.innerText = 'Send';
     for (let i = 0; i < 7; i++) {
         let th = document.createElement('th');
         if (!i) {
@@ -469,8 +471,10 @@ let createTable = () => {
     table.appendChild(tBody);
     tableBlock.innerHTML = '';
     tableBlock.appendChild(table);
-    tableBlock.appendChild(pushDataBtn);
-
+    let sendBtn = document.createElement('button');
+    sendBtn.className = 'send';
+    sendBtn.innerText = 'send';
+    tableBlock.appendChild(sendBtn);
 
 }
 
@@ -517,7 +521,9 @@ let deleteConfirmation = (index) => {
             document.body.lastChild.remove();
         }
         if (target.classList.contains('confirmBtn')) {
+            deleteData(`http://localhost:3000/data/${entities[index].id}`)
             entities.splice(index, 1);
+
             createTable();
             document.body.lastChild.remove();
         }
@@ -561,6 +567,7 @@ let changeEntity = (index) => {
                 }
             }
             createTable();
+            putData(`http://localhost:3000/data/${entities[index].id}`, entities[index])
             document.body.lastChild.remove();
         }
     })
@@ -591,7 +598,7 @@ let postData = (url) => {
     let xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(entities));
+    xhr.send(JSON.stringify(entities[entities.length - 1]));
 }
 let getData = (url) => {
     let xhr = new XMLHttpRequest();
@@ -602,9 +609,19 @@ let getData = (url) => {
         console.log(transformData)
     }
     xhr.send()
-    entities = transformData[0]
+    entities = transformData //- PROBLEM
 }
-
+let putData = (url, data) => {
+    let xhr = new XMLHttpRequest();
+    xhr.open("PUT", url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(data));
+}
+let deleteData = (url) => {
+    xhr = new XMLHttpRequest();
+    xhr.open("DELETE", url, true);
+    xhr.send();
+}
 let mainBlock = () => {
     let main = document.querySelector('.block');
     let createBtn = document.createElement('button');
@@ -628,8 +645,11 @@ let mainBlock = () => {
         } else if (target.classList.contains('infoBtn')) {
             let index = target.parentNode.parentNode.rowIndex - 1;
             let infoWindow = new ModalWindow(showInformation(index));
-        } else if (target.classList.contains('pushDataBtn')) {
-            postData("http://localhost:3000/data");
+        } else if (target.classList.contains('send')) {
+            // putData('http://localhost:3000/data/1', {
+            //     name: 'valick'
+            // });
+            deleteData('http://localhost:3000/data/1');
         }
     })
 
