@@ -307,9 +307,9 @@ function newItemSection() {
                         }
 
                     }
-
+                    entity.info.id = entities.length + 1;
                     entities.push(entity.info);
-                    postData("http://localhost:3000/data");
+                    postData('http://localhost:3000/data')
                     createTable();
 
                 } else if (entitySelect.value == 'ultrabook') {
@@ -343,9 +343,11 @@ function newItemSection() {
                         }
 
                     }
+                    entity.info.id = entities.length + 1;
 
                     entities.push(entity.info);
-                    postData("http://localhost:3000/data");
+                    postData('http://localhost:3000/data')
+
                     createTable();
 
                 } else if (entitySelect.value == 'server') {
@@ -378,9 +380,11 @@ function newItemSection() {
                             entity.setCoreArchtecture(inputs[i].value);
                         }
                     }
+                    entity.info.id = entities.length + 1;
 
                     entities.push(entity.info);
-                    postData("http://localhost:3000/data");
+                    postData('http://localhost:3000/data')
+
                     createTable();
                 }
             }
@@ -511,7 +515,9 @@ function deleteConfirmation(index) {
             document.body.lastChild.remove();
         }
         if (target.classList.contains('confirmBtn')) {
+            deleteData(`http://localhost:3000/data/${entities[index].id}`)
             entities.splice(index, 1);
+
             createTable();
             document.body.lastChild.remove();
         }
@@ -541,7 +547,7 @@ function changeEntity(index) {
     saveBtn.className = 'saveBtn';
     saveBtn.innerText = 'Save';
     content.appendChild(saveBtn);
-    content.addEventListener('click', function (e) {
+    content.addEventListener('click', (e) => {
         let target = e.target;
         if (target.classList.contains('saveBtn')) {
             let inputs = content.children;
@@ -555,6 +561,7 @@ function changeEntity(index) {
                 }
             }
             createTable();
+            putData(`http://localhost:3000/data/${entities[index].id}`, entities[index])
             document.body.lastChild.remove();
         }
     })
@@ -572,11 +579,21 @@ let getData = (url) => {
     xhr.open("GET", url, false);
     xhr.onreadystatechange = () => {
         transformData = JSON.parse(xhr.responseText);
-
+        console.log(transformData)
     }
     xhr.send()
-    entities = transformData
-    // return transformData;
+    entities = transformData //- PROBLEM
+}
+let putData = (url, data) => {
+    let xhr = new XMLHttpRequest();
+    xhr.open("PUT", url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(data));
+}
+let deleteData = (url) => {
+    xhr = new XMLHttpRequest();
+    xhr.open("DELETE", url, true);
+    xhr.send();
 }
 
 function mainBlock() {
