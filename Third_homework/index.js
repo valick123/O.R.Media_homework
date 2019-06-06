@@ -84,8 +84,8 @@ function Server() {
 let entities = [];
 
 
-function newItemSection() {
-    function defaultHTML() {
+let newItemSection = () => {
+    let defaultHTML = () => {
         let block = document.querySelector('.block');
 
         let createSection = document.createElement('div');
@@ -200,10 +200,9 @@ function newItemSection() {
         createSection.appendChild(resetBtn);
         block.appendChild(createSection);
         block.appendChild(tableBlock)
-        createTable();
     }
 
-    function ultrabookFields(block) {
+    let ultrabookFields = (block) => {
         let hardwareSize = document.createElement('input');
         hardwareSize.setAttribute('type', 'text');
         hardwareSize.setAttribute('id', 'hardwareSize');
@@ -226,7 +225,7 @@ function newItemSection() {
         return block;
     }
 
-    function serverFields(block) {
+    let serverFields = (block) => {
         let hyperTreading = document.createElement('input');
         hyperTreading.setAttribute('type', 'text');
         hyperTreading.setAttribute('id', 'hyperTreading');
@@ -250,7 +249,7 @@ function newItemSection() {
         return block;
     }
 
-    function renderHTML() {
+    let renderHTML = () => {
         let block = document.querySelector('.block');
         let customInputs = document.querySelector('.customInputs');
         let createSection = document.querySelector('.createSection');
@@ -307,9 +306,9 @@ function newItemSection() {
                         }
 
                     }
-
+                    entity.info.id = entities.length + 1;
                     entities.push(entity.info);
-                    postData("http://localhost:3000/data");
+                    postData('http://localhost:3000/data')
                     createTable();
 
                 } else if (entitySelect.value == 'ultrabook') {
@@ -343,9 +342,11 @@ function newItemSection() {
                         }
 
                     }
+                    entity.info.id = entities.length + 1;
 
                     entities.push(entity.info);
-                    postData("http://localhost:3000/data");
+                    postData('http://localhost:3000/data')
+
                     createTable();
 
                 } else if (entitySelect.value == 'server') {
@@ -378,9 +379,11 @@ function newItemSection() {
                             entity.setCoreArchtecture(inputs[i].value);
                         }
                     }
+                    entity.info.id = entities.length + 1;
 
                     entities.push(entity.info);
-                    postData("http://localhost:3000/data");
+                    postData('http://localhost:3000/data')
+
                     createTable();
                 }
             }
@@ -398,7 +401,7 @@ function newItemSection() {
     renderHTML();
 }
 
-function createTable() {
+let createTable = () => {
     let tableBlock = document.querySelector('.tableBlock');
 
     let table = document.createElement('table');
@@ -469,7 +472,6 @@ function createTable() {
     tableBlock.innerHTML = '';
     tableBlock.appendChild(table);
 
-
 }
 
 function ModalWindow(content) {
@@ -495,7 +497,7 @@ function ModalWindow(content) {
 }
 
 
-function deleteConfirmation(index) {
+let deleteConfirmation = (index) => {
     let content = document.createElement('div');
     content.className = 'deleteContent';
     let header = document.createElement('h1');
@@ -515,7 +517,9 @@ function deleteConfirmation(index) {
             document.body.lastChild.remove();
         }
         if (target.classList.contains('confirmBtn')) {
+            deleteData(`http://localhost:3000/data/${entities[index].id}`)
             entities.splice(index, 1);
+
             createTable();
             document.body.lastChild.remove();
         }
@@ -524,7 +528,7 @@ function deleteConfirmation(index) {
 
 }
 
-function changeEntity(index) {
+let changeEntity = (index) => {
     let content = document.createElement('div');
     content.className = 'changeContent';
 
@@ -545,7 +549,7 @@ function changeEntity(index) {
     saveBtn.className = 'saveBtn';
     saveBtn.innerText = 'Save';
     content.appendChild(saveBtn);
-    content.addEventListener('click', function (e) {
+    content.addEventListener('click', (e) => {
         let target = e.target;
         if (target.classList.contains('saveBtn')) {
             let inputs = content.children;
@@ -559,13 +563,14 @@ function changeEntity(index) {
                 }
             }
             createTable();
+            putData(`http://localhost:3000/data/${entities[index].id}`, entities[index])
             document.body.lastChild.remove();
         }
     })
     return content;
 }
 
-function showInformation(index) {
+let showInformation = (index) => {
     let content = document.createElement("div");
     content.className = 'infoContent';
     let infoTable = document.createElement('table');
@@ -597,14 +602,23 @@ let getData = (url) => {
     xhr.open("GET", url, false);
     xhr.onreadystatechange = () => {
         transformData = JSON.parse(xhr.responseText);
-
+        console.log(transformData)
     }
     xhr.send()
-    entities = transformData
-    // return transformData;
+    entities = transformData //- PROBLEM
 }
-
-function mainBlock() {
+let putData = (url, data) => {
+    let xhr = new XMLHttpRequest();
+    xhr.open("PUT", url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(data));
+}
+let deleteData = (url) => {
+    xhr = new XMLHttpRequest();
+    xhr.open("DELETE", url, true);
+    xhr.send();
+}
+let mainBlock = () => {
     let main = document.querySelector('.block');
     let createBtn = document.createElement('button');
     createBtn.className = 'createBtn';
@@ -615,18 +629,19 @@ function mainBlock() {
     main.appendChild(createBtn);
     main.appendChild(getDataBtn);
     newItemSection();
-    main.addEventListener("click", function (e) {
-        let target = e.target;
-        if (target.classList.contains('changeBtn')) {
-            let index = target.parentNode.parentNode.rowIndex - 1;
-            let changeWindow = new ModalWindow(changeEntity(index));
+    main.addEventListener("click", (e) => {
+            let target = e.target;
+            if (target.classList.contains('changeBtn')) {
+                let index = target.parentNode.parentNode.rowIndex - 1;
+                let changeWindow = new ModalWindow(changeEntity(index));
 
-        } else if (target.classList.contains('deleteBtn')) {
-            let index = target.parentNode.parentNode.rowIndex - 1;
-            let deleteWindow = new ModalWindow(deleteConfirmation(index));
-        } else if (target.classList.contains('infoBtn')) {
-            let index = target.parentNode.parentNode.rowIndex - 1;
-            let infoWindow = new ModalWindow(showInformation(index));
+            } else if (target.classList.contains('deleteBtn')) {
+                let index = target.parentNode.parentNode.rowIndex - 1;
+                let deleteWindow = new ModalWindow(deleteConfirmation(index));
+            } else if (target.classList.contains('infoBtn')) {
+                let index = target.parentNode.parentNode.rowIndex - 1;
+                let infoWindow = new ModalWindow(showInformation(index));
+            }
         }
     })
 
