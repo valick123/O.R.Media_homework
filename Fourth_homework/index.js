@@ -471,10 +471,6 @@ let createTable = () => {
     table.appendChild(tBody);
     tableBlock.innerHTML = '';
     tableBlock.appendChild(table);
-    let sendBtn = document.createElement('button');
-    sendBtn.className = 'send';
-    sendBtn.innerText = 'send';
-    tableBlock.appendChild(sendBtn);
 
 }
 
@@ -634,22 +630,18 @@ let mainBlock = () => {
     main.appendChild(getDataBtn);
     newItemSection();
     main.addEventListener("click", (e) => {
-        let target = e.target;
-        if (target.classList.contains('changeBtn')) {
-            let index = target.parentNode.parentNode.rowIndex - 1;
-            let changeWindow = new ModalWindow(changeEntity(index));
+            let target = e.target;
+            if (target.classList.contains('changeBtn')) {
+                let index = target.parentNode.parentNode.rowIndex - 1;
+                let changeWindow = new ModalWindow(changeEntity(index));
 
-        } else if (target.classList.contains('deleteBtn')) {
-            let index = target.parentNode.parentNode.rowIndex - 1;
-            let deleteWindow = new ModalWindow(deleteConfirmation(index));
-        } else if (target.classList.contains('infoBtn')) {
-            let index = target.parentNode.parentNode.rowIndex - 1;
-            let infoWindow = new ModalWindow(showInformation(index));
-        } else if (target.classList.contains('send')) {
-            // putData('http://localhost:3000/data/1', {
-            //     name: 'valick'
-            // });
-            deleteData('http://localhost:3000/data/1');
+            } else if (target.classList.contains('deleteBtn')) {
+                let index = target.parentNode.parentNode.rowIndex - 1;
+                let deleteWindow = new ModalWindow(deleteConfirmation(index));
+            } else if (target.classList.contains('infoBtn')) {
+                let index = target.parentNode.parentNode.rowIndex - 1;
+                let infoWindow = new ModalWindow(showInformation(index));
+            }
         }
     })
 
